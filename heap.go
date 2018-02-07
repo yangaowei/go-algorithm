@@ -66,7 +66,7 @@ func (heap *Heap) sortPrint(node int) {
 func (heap *Heap) buildHeapDown() {
 	start := heap.getParentIndex(heap.length - 1)
 	for start >= 0 {
-		heap.adjustDownHeap(start)
+		heap.adjustDownHeap(start, len(heap.data))
 		start -= 1
 	}
 }
@@ -79,19 +79,23 @@ func (heap *Heap) buildHeapUp() {
 	}
 }
 
-func (heap *Heap) adjustDownHeap(node int) {
-	right := heap.getRightChildIndex(node)
-	left := heap.getLeftChildIndex(node)
-	max := node
-	if right < heap.length && heap.data[right] > heap.data[max] {
-		max = right
-	}
-	if left < heap.length && heap.data[left] > heap.data[max] {
-		max = left
-	}
-	if max != node {
-		heap.swap(node, max)
-		heap.adjustDownHeap(max)
+func (heap *Heap) adjustDownHeap(node int, size int) {
+	for {
+		right := heap.getRightChildIndex(node)
+		left := heap.getLeftChildIndex(node)
+		max := node
+		if right < size && heap.data[right] > heap.data[max] {
+			max = right
+		}
+		if left < size && heap.data[left] > heap.data[max] {
+			max = left
+		}
+		if max != node {
+			heap.swap(node, max)
+			node = max
+		} else {
+			break
+		}
 	}
 }
 
@@ -115,7 +119,11 @@ func main() {
 	fmt.Println(data)
 	heap := Heap{data: data, length: len(data)}
 	//heap.sortPrint(0)
-	heap.buildHeapUp()
+	heap.buildHeapDown()
 	fmt.Println(heap.data)
-	heap.sortPrint(0)
+	for i := len(heap.data) - 1; i > 0; i-- {
+		heap.swap(0, i)
+		heap.adjustDownHeap(0, i)
+	}
+	fmt.Println(heap.data)
 }
